@@ -1,0 +1,45 @@
+[Unit]
+Description=Play Store research crawler (daily incremental crawl)
+Documentation=file:///opt/playstore-crawler/README.md
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=exec
+User=crawler
+Group=crawler
+WorkingDirectory=/opt/playstore-crawler
+EnvironmentFile=/opt/playstore-crawler/.env
+ExecStart=/usr/bin/node --max-old-space-size=512 src/cli.js crawl
+
+# Graceful shutdown: SIGTERM -> stop scheduling, finish in-flight requests,
+# checkpoint, release leases. SHUTDOWN_GRACE_MS (default 30s) < TimeoutStopSec.
+KillSignal=SIGTERM
+KillMode=mixed
+TimeoutStopSec=90
+
+# 5 = paused/interrupted with progress saved (resumes on the next run).
+SuccessExitStatus=5
+Restart=no
+
+# Keep the crawler a good neighbour on a 4 GB VPS.
+MemoryHigh=768M
+MemoryMax=1G
+CPUQuota=100%
+Nice=10
+IOSchedulingClass=idle
+
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,10 @@
+# Alternative to the systemd timer. Install with: crontab -u crawler deploy/crontab.example
+# flock prevents overlap (the crawler also holds a PostgreSQL advisory lock).
+SHELL=/bin/bash
+CRAWLER_DIR=/opt/playstore-crawler
+
+# Daily crawl at 03:17 (+ random delay of up to 30 min to avoid synchronized bursts)
+17 3 * * * sleep $((RANDOM \% 1800)); cd $CRAWLER_DIR && flock -n /tmp/playstore-crawler.lock node --max-old-space-size=512 src/cli.js crawl >> /var/log/playstore-crawler/crawl.log 2>&1
+
+# Resume an interrupted run after a reboot
+@reboot sleep 900; cd $CRAWLER_DIR && flock -n /tmp/playstore-crawler.lock node --max-old-space-size=512 src/cli.js crawl >> /var/log/playstore-crawler/crawl.log 2>&1

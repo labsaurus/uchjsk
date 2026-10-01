@@ -1,0 +1,15 @@
+[Unit]
+Description=Run the Play Store research crawler daily
+
+[Timer]
+# Daily at ~03:15 local time, randomized so we never hit the server on a round minute.
+OnCalendar=*-*-* 03:15:00
+RandomizedDelaySec=30min
+# Run a missed crawl after downtime.
+Persistent=true
+# After a reboot, resume an interrupted run (a no-op if today's crawl already completed).
+OnBootSec=15min
+Unit=playstore-crawler.service
+
+[Install]
+WantedBy=timers.target

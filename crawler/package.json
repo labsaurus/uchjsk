@@ -1,0 +1,23 @@
+{
+  "name": "playstore-research-crawler",
+  "version": "1.0.0",
+  "description": "Conservative, rate-limited, resumable Google Play Store research crawler backed by PostgreSQL.",
+  "type": "module",
+  "main": "src/cli.js",
+  "bin": {
+    "ps-crawler": "src/cli.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "migrate": "node src/cli.js migrate",
+    "crawl": "node --max-old-space-size=512 src/cli.js crawl",
+    "status": "node src/cli.js status",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "pg": "^8.13.0"
+  },
+  "license": "MIT"
+}

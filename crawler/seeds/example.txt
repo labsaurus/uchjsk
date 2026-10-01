@@ -1,0 +1,7 @@
+# One package name per line. Comments and blank lines are ignored.
+# Discovery (DISCOVERY_ENABLED=true) grows the list from links on crawled pages.
+com.whatsapp
+org.mozilla.firefox
+com.spotify.music
+org.wikipedia
+com.duolingo
