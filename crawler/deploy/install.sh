@@ -24,4 +24,4 @@ echo "  1. Edit $APP_DIR/.env (DATABASE_URL, USER_AGENT with a contact address)"
 echo "  2. sudo -u $APP_USER bash -c 'cd $APP_DIR && node src/cli.js migrate'"
 echo "  3. sudo -u $APP_USER bash -c 'cd $APP_DIR && node src/cli.js seed seeds/example.txt'"
 echo "  4. systemctl enable --now playstore-crawler.timer"
-echo "  5. (optional) systemctl enable --now playstore-dashboard  
+echo "  5. (optional) systemctl enable --now playstore-dashboard   # web UI on 127.0.0.1:8080"

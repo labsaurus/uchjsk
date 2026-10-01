@@ -1,2 +1,0 @@
-echo "  4. systemctl enable --now playstore-crawler.timer"
-echo "  5. (optional) systemctl enable --now playstore-dashboard  
