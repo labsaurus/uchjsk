@@ -120,6 +120,12 @@ export function buildConfig(env = process.env) {
     maxDiscoveredPerRun: num(env, 'MAX_DISCOVERED_PER_RUN', 2000, { min: 0, max: 10_000_000, int: true }),
     maxTotalApps: num(env, 'MAX_TOTAL_APPS', 200_000, { min: 1, max: 100_000_000, int: true }),
 
+    // --- dashboard -----------------------------------------------------------
+    dashboardHost: str(env, 'DASHBOARD_HOST', '127.0.0.1'),
+    dashboardPort: num(env, 'DASHBOARD_PORT', 8080, { min: 1, max: 65535, int: true }),
+    dashboardUser: str(env, 'DASHBOARD_USER', ''),
+    dashboardPassword: str(env, 'DASHBOARD_PASSWORD', ''),
+
     // --- process -------------------------------------------------------------
     shutdownGraceMs: num(env, 'SHUTDOWN_GRACE_MS', 30_000, { min: 1000, max: 600_000 }),
     checkpointIntervalMs: num(env, 'CHECKPOINT_INTERVAL_MS', 15_000, { min: 1000, max: 600_000 }),

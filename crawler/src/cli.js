@@ -7,6 +7,7 @@
 //   status                        show counts, due apps and recent runs
 //   mark-all-due                  make every known app due on the next crawl
 //   clear-block                   clear a hard-block cooldown (after investigating!)
+//   serve                         start the read-only web dashboard
 
 import fs from 'node:fs';
 import { buildConfig, loadDotEnv } from './config.js';
@@ -15,6 +16,7 @@ import { createPool, migrate } from './db.js';
 import { Store } from './store.js';
 import { Crawler } from './crawler.js';
 import { isValidPackageName } from './parser.js';
+import { createDashboard } from './dashboard/server.js';
 
 const EXIT = { ok: 0, error: 1, usage: 2, blocked: 3, locked: 4, incomplete: 5 };
 
@@ -84,6 +86,21 @@ async function main(argv) {
         return EXIT.ok;
       }
 
+      case 'serve': {
+        const server = createDashboard({ cfg, pool, log });
+        await new Promise((resolve, reject) => {
+          server.once('error', reject);
+          server.listen(cfg.dashboardPort, cfg.dashboardHost, resolve);
+        });
+        log.info('dashboard listening', { url: `http://${cfg.dashboardHost}:${cfg.dashboardPort}/`, auth: Boolean(cfg.dashboardUser) });
+        await new Promise((resolve) => {
+          const shutdown = () => server.close(() => resolve());
+          process.once('SIGINT', shutdown);
+          process.once('SIGTERM', shutdown);
+        });
+        return EXIT.ok;
+      }
+
       default:
         process.stderr.write(`unknown command: ${cmd}\n\n${usage()}`);
         return EXIT.usage;
@@ -136,6 +153,7 @@ Commands:
   status                       Print app counts, due apps and recent runs
   mark-all-due                 Make every known app due for the next incremental crawl
   clear-block                  Clear a hard-block cooldown (only after investigating the cause)
+  serve                        Start the read-only web dashboard (DASHBOARD_HOST:DASHBOARD_PORT)
 
 Exit codes: 0 ok, 1 error, 2 usage, 3 blocked, 4 another instance running, 5 paused/interrupted (resumes next run)
 `;

@@ -1,0 +1,21 @@
+[Unit]
+Description=Play Store crawler read-only web dashboard
+After=network-online.target postgresql.service
+
+[Service]
+Type=exec
+User=crawler
+Group=crawler
+WorkingDirectory=/opt/playstore-crawler
+EnvironmentFile=/opt/playstore-crawler/.env
+ExecStart=/usr/bin/node --max-old-space-size=128 src/cli.js serve
+Restart=on-failure
+RestartSec=5
+MemoryMax=256M
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

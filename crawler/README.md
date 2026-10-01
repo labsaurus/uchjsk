@@ -155,6 +155,7 @@ node src/cli.js crawl --force            # crawl again even if today's run compl
 node src/cli.js status                   # counts, due apps, recent runs (JSON)
 node src/cli.js mark-all-due             # make every app due for the next crawl
 node src/cli.js clear-block              # clear a hard-block cooldown (investigate first!)
+node src/cli.js serve                    # read-only web dashboard on 127.0.0.1:8080
 ```
 
 Logs are written as one JSON line per event to stdout/stderr, so journald
@@ -172,6 +173,42 @@ journalctl -u playstore-crawler -f
 | 3 | Blocked: an anti-bot challenge or 403 was seen, or a cooldown is active |
 | 4 | Another instance is already running |
 | 5 | Paused or interrupted; progress is saved and the next run resumes it. systemd treats this as success. |
+
+## Web dashboard
+
+`node src/cli.js serve` starts a small, read-only web dashboard. It has no
+extra dependencies and runs as plain server-rendered HTML. It shows:
+
+- **Overview:** total, active and due apps, average rating, the last run, a
+  category breakdown and status counts.
+- **Apps:** search by name, package or developer; filter by status or
+  category; sort; pagination.
+- **App detail:** store details, crawl state, charts of rating and number of
+  ratings over time (from `app_snapshots`), and the change history.
+- **Runs:** progress, outcomes, HTTP requests, retries and duration for each
+  crawl run.
+
+By default it listens on `127.0.0.1:8080` only. To open it from your own
+computer, use an SSH tunnel:
+
+```bash
+ssh -L 8080:127.0.0.1:8080 you@your-vps   # then open http://localhost:8080
+```
+
+To run it permanently, use `systemctl enable --now playstore-dashboard`. If you
+expose it publicly, set `DASHBOARD_USER` and `DASHBOARD_PASSWORD` (HTTP Basic
+auth) and put it behind an HTTPS reverse proxy. If `PLAY_BASE_URL` is not Google
+Play, the dashboard shows a "Test data" banner.
+
+### Demo without touching Google Play
+
+`demo/run-demo.sh` starts a local mock server that serves fictional apps. It
+crawls six simulated "days" into a separate, empty database and then opens the
+dashboard:
+
+```bash
+DEMO_DATABASE_URL=postgres://crawler:pass@localhost/playstore_demo ./demo/run-demo.sh
+```
 
 ## Configuration
 
